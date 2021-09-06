@@ -52,8 +52,8 @@ In `baseentity_shared.h`, add this after line 251:
 **Step 2**  
 In `c_baseentity.h`, in the class declaration for `C_BaseEntity`, add the following member variables and functions:
 ```cpp
-	bool m_bUseRagdollModelInstance = false;
-	ModelInstanceHandle_t m_RagdollModelInstance = MODEL_INSTANCE_INVALID;
+    bool m_bUseRagdollModelInstance = false;
+    ModelInstanceHandle_t m_RagdollModelInstance = MODEL_INSTANCE_INVALID;
 
     virtual ModelInstanceHandle_t GetDecalModelInstance();
 ```
