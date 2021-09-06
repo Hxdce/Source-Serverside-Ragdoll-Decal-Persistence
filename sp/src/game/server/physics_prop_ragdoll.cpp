@@ -1287,6 +1287,13 @@ CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char 
 	memcpy( pBoneToWorldNext, pBoneToWorld, sizeof(pBoneToWorld) );
 
 	pRagdoll->InitRagdoll( vec3_origin, -1, vec3_origin, pBoneToWorld, pBoneToWorldNext, 0.1, collisionGroup, true );
+
+// New code:
+	// For ragdoll cleanup.
+	pRagdoll->AddSpawnFlags(SF_RAGDOLLPROP_USE_LRU_RETIREMENT);
+	s_RagdollLRU.MoveToTopOfLRU(pRagdoll);
+//
+
 	return pRagdoll;
 }
 
@@ -1440,6 +1447,15 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	mins = pAnimating->CollisionProp()->OBBMins();
 	maxs = pAnimating->CollisionProp()->OBBMaxs();
 	pRagdoll->CollisionProp()->SetCollisionBounds( mins, maxs );
+
+// New code:
+	// Snatch the model instance from the NPC to its ragdoll to copy its impact decals,
+	// and redirect any further impact decals to this ragdoll.
+	EntityMessageBegin(pRagdoll);
+		WRITE_BYTE(BASEENTITY_MSG_SNATCH_MODEL_INSTANCE);
+		WRITE_LONG(pAnimating->entindex());
+	MessageEnd();
+//
 
 	return pRagdoll;
 }

@@ -249,6 +249,9 @@ inline bool CBaseEntity::IsEffectActive( int nEffects ) const
 
 // Shared EntityMessage between game and client .dlls
 #define BASEENTITY_MSG_REMOVE_DECALS	1
+// New code:
+#define BASEENTITY_MSG_SNATCH_MODEL_INSTANCE 64
+//
 
 extern float k_flMaxEntityPosCoord;
 extern float k_flMaxEntityEulerAngle;

@@ -1169,6 +1169,14 @@ public:
 
 	void CreateModelInstance();
 
+// New code:
+	bool m_bUseRagdollModelInstance = false;
+	ModelInstanceHandle_t m_RagdollModelInstance = MODEL_INSTANCE_INVALID;
+
+    virtual ModelInstanceHandle_t GetDecalModelInstance();
+//
+
+
 	// Sets the origin + angles to match the last position received
 	void MoveToLastReceivedPosition( bool force = false );
 

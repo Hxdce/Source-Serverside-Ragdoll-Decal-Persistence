@@ -1460,8 +1460,31 @@ void C_BaseEntity::ReceiveMessage( int classID, bf_read &msg )
 	{
 		case BASEENTITY_MSG_REMOVE_DECALS:	RemoveAllDecals();
 											break;
+// New code:
+		case BASEENTITY_MSG_SNATCH_MODEL_INSTANCE:
+			// Model instance snatching from input to this entity.
+			int eIndex = msg.ReadLong();
+			C_BaseEntity* c = ClientEntityList().GetEnt(eIndex);
+			c->SnatchModelInstance(this);
+			// This will redirect any future impact decals to the ragdoll, 
+			// allowing the impact decals from a killing shot to appear on it as well.
+			c->m_bUseRagdollModelInstance = true;
+			c->m_RagdollModelInstance = m_ModelInstance;
+			break;
+//
 	}
 }
+
+// New code:
+ModelInstanceHandle_t C_BaseEntity::GetDecalModelInstance() {
+	ModelInstanceHandle_t output = m_ModelInstance;
+	if (m_bUseRagdollModelInstance && m_RagdollModelInstance != MODEL_INSTANCE_INVALID) {
+		// Use our ragdoll model instance so any decals appear on it instead.
+		output = m_RagdollModelInstance;
+	}
+	return output;
+}
+//
 
 
 void* C_BaseEntity::GetDataTableBasePtr()
@@ -3603,11 +3626,19 @@ void C_BaseEntity::AddStudioDecal( const Ray_t& ray, int hitbox, int decalIndex,
 		VectorSubtract( tr.endpos, tr.plane.normal, temp );
 		Ray_t betterRay;
 		betterRay.Init( tr.endpos, temp );
-		modelrender->AddDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal );
+// New code:
+		ModelInstanceHandle_t i = GetDecalModelInstance();
+		modelrender->AddDecal(i, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal);
+// Old code:
+		//modelrender->AddDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal );
 	}
 	else
 	{
-		modelrender->AddDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal );
+// New code:
+		ModelInstanceHandle_t i = GetDecalModelInstance();
+		modelrender->AddDecal(i, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal);
+// Old code:
+		//modelrender->AddDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal );
 	}
 }
 
@@ -3645,11 +3676,19 @@ void C_BaseEntity::AddColoredStudioDecal( const Ray_t& ray, int hitbox, int deca
 		VectorSubtract( tr.endpos, tr.plane.normal, temp );
 		Ray_t betterRay;
 		betterRay.Init( tr.endpos, temp );
-		modelrender->AddColoredDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal );
+// New code:
+		ModelInstanceHandle_t i = GetDecalModelInstance();
+		modelrender->AddColoredDecal(i, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal);
+// Old code:
+		//modelrender->AddColoredDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal );
 	}
 	else
 	{
-		modelrender->AddColoredDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal );
+// New code:
+		ModelInstanceHandle_t i = GetDecalModelInstance();
+		modelrender->AddColoredDecal(i, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal);
+// Old code:
+		//modelrender->AddColoredDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal );
 	}
 }
 
