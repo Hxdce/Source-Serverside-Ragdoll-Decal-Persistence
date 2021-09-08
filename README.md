@@ -66,11 +66,16 @@ case BASEENTITY_MSG_SNATCH_MODEL_INSTANCE:
     // Model instance snatching from input to this entity.
     int eIndex = msg.ReadLong();
     C_BaseEntity* c = ClientEntityList().GetEnt(eIndex);
-    c->SnatchModelInstance(this);
-    // This will redirect any future impact decals to the ragdoll, 
-    // allowing the impact decals from a killing shot to appear on it as well.
-    c->m_bUseRagdollModelInstance = true;
-    c->m_RagdollModelInstance = m_ModelInstance;
+	if (c) {
+		c->SnatchModelInstance(this);
+		// This will redirect any future impact decals to the ragdoll, 
+		// allowing the impact decals from a killing shot to appear on it as well.
+		c->m_bUseRagdollModelInstance = true;
+		c->m_RagdollModelInstance = m_ModelInstance;
+	}
+	else {
+		DevMsg("Tried to snatch model instance with nonexistent entity!\n");
+	}
     break;
 ```
 Add the following member function definition:
