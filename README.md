@@ -52,10 +52,10 @@ In `baseentity_shared.h`, add this after line 251:
 **Step 2**  
 In `c_baseentity.h`, in the class declaration for `C_BaseEntity`, add the following member variables and functions:
 ```cpp
-    bool m_bUseRagdollModelInstance = false;
-    ModelInstanceHandle_t m_RagdollModelInstance = MODEL_INSTANCE_INVALID;
+bool m_bUseRagdollModelInstance = false;
+ModelInstanceHandle_t m_RagdollModelInstance = MODEL_INSTANCE_INVALID;
 
-    virtual ModelInstanceHandle_t GetDecalModelInstance();
+virtual ModelInstanceHandle_t GetDecalModelInstance();
 ```
 
 --  
@@ -91,54 +91,54 @@ ModelInstanceHandle_t C_BaseEntity::GetDecalModelInstance() {
 ```
 In the definition for `C_BaseEntity::AddStudioDecal(...)`, do as follows:
 ```cpp
-	if (doTrace && (GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
-	{
-		// Choose a more accurate normal direction
-		// Also, since we have more accurate info, we can avoid pokethru
-		Vector temp;
-		VectorSubtract( tr.endpos, tr.plane.normal, temp );
-		Ray_t betterRay;
-		betterRay.Init( tr.endpos, temp );
+if (doTrace && (GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
+{
+	// Choose a more accurate normal direction
+	// Also, since we have more accurate info, we can avoid pokethru
+	Vector temp;
+	VectorSubtract( tr.endpos, tr.plane.normal, temp );
+	Ray_t betterRay;
+	betterRay.Init( tr.endpos, temp );
 // New code:
-		ModelInstanceHandle_t i = GetDecalModelInstance();
-		modelrender->AddDecal(i, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal);
+	ModelInstanceHandle_t i = GetDecalModelInstance();
+	modelrender->AddDecal(i, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal);
 // Old code:
-		//modelrender->AddDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal );
-	}
-	else
-	{
+	//modelrender->AddDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), true, maxLODToDecal );
+}
+else
+{
 // New code:
-		ModelInstanceHandle_t i = GetDecalModelInstance();
-		modelrender->AddDecal(i, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal);
+	ModelInstanceHandle_t i = GetDecalModelInstance();
+	modelrender->AddDecal(i, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal);
 // Old code:
-		//modelrender->AddDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal );
-	}
+	//modelrender->AddDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), false, maxLODToDecal );
+}
 ```
 
 Then, in the definition for `C_BaseEntity::AddColoredStudioDecal(...)`, do as follows:
 ```cpp
-	if (doTrace && (GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
-	{
-		// Choose a more accurate normal direction
-		// Also, since we have more accurate info, we can avoid pokethru
-		Vector temp;
-		VectorSubtract( tr.endpos, tr.plane.normal, temp );
-		Ray_t betterRay;
-		betterRay.Init( tr.endpos, temp );
+if (doTrace && (GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
+{
+	// Choose a more accurate normal direction
+	// Also, since we have more accurate info, we can avoid pokethru
+	Vector temp;
+	VectorSubtract( tr.endpos, tr.plane.normal, temp );
+	Ray_t betterRay;
+	betterRay.Init( tr.endpos, temp );
 // New code:
-		ModelInstanceHandle_t i = GetDecalModelInstance();
-		modelrender->AddColoredDecal(i, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal);
+	ModelInstanceHandle_t i = GetDecalModelInstance();
+	modelrender->AddColoredDecal(i, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal);
 // Old code:
-		//modelrender->AddColoredDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal );
-	}
-	else
-	{
+	//modelrender->AddColoredDecal( m_ModelInstance, betterRay, up, decalIndex, GetStudioBody(), cColor, true, maxLODToDecal );
+}
+else
+{
 // New code:
-		ModelInstanceHandle_t i = GetDecalModelInstance();
-		modelrender->AddColoredDecal(i, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal);
+	ModelInstanceHandle_t i = GetDecalModelInstance();
+	modelrender->AddColoredDecal(i, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal);
 // Old code:
-		//modelrender->AddColoredDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal );
-	}
+	//modelrender->AddColoredDecal( m_ModelInstance, ray, up, decalIndex, GetStudioBody(), cColor, false, maxLODToDecal );
+}
 ```
 
 
@@ -146,18 +146,18 @@ Then, in the definition for `C_BaseEntity::AddColoredStudioDecal(...)`, do as fo
 **Step 4**  
 In `physics_prop_ragdoll.cpp`, in the function CreateServerRagdollSubmodel, add the following before the return statement:
 ```cpp
-	// For ragdoll cleanup.
-	pRagdoll->AddSpawnFlags(SF_RAGDOLLPROP_USE_LRU_RETIREMENT);
-	s_RagdollLRU.MoveToTopOfLRU(pRagdoll);
+// For ragdoll cleanup.
+pRagdoll->AddSpawnFlags(SF_RAGDOLLPROP_USE_LRU_RETIREMENT);
+s_RagdollLRU.MoveToTopOfLRU(pRagdoll);
 ```
 Finally, in the function CreateServerRagdoll, add the following before the return statement:
 ```cpp
-	// Snatch the model instance from the NPC to its ragdoll to copy its impact decals,
-	// and redirect any further impact decals to this ragdoll.
-	EntityMessageBegin(pRagdoll);
-		WRITE_BYTE(BASEENTITY_MSG_SNATCH_MODEL_INSTANCE);
-		WRITE_LONG(pAnimating->entindex());
-	MessageEnd();
+// Snatch the model instance from the NPC to its ragdoll to copy its impact decals,
+// and redirect any further impact decals to this ragdoll.
+EntityMessageBegin(pRagdoll);
+	WRITE_BYTE(BASEENTITY_MSG_SNATCH_MODEL_INSTANCE);
+	WRITE_LONG(pAnimating->entindex());
+MessageEnd();
 ```
 
 After this, compile as normal. An easy way too see it in action is to set the convar `ai_force_serverside_ragdolls` to 1.
