@@ -17,7 +17,6 @@ Created by Hxdce.
 Presently, this has some small issues with Half-Life 2's Zombie NPCs:
 
 * Not all of their death states will trigger serverside ragdolls spawning. -- **Fixed!** Will be included in a future update.
-* If the zombie's death also kills their headcrab, the headcrab will detach, fall through the level geometry, then disappear. -- **Todo!**
 
 Fixes are in development for these problems.
 ****
